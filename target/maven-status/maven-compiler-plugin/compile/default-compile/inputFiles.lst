@@ -1,0 +1,10 @@
+/home/ivanas/Documents/repository/personal/github/remote-reader-prometheus-source-flink/target/generated-sources/protobuf/java/com/google/protobuf/GoGoProtos.java
+/home/ivanas/Documents/repository/personal/github/remote-reader-prometheus-source-flink/src/main/java/com/github/ivanas93/reader/model/Sample.java
+/home/ivanas/Documents/repository/personal/github/remote-reader-prometheus-source-flink/src/main/java/com/github/ivanas93/reader/PrometheusHandler.java
+/home/ivanas/Documents/repository/personal/github/remote-reader-prometheus-source-flink/target/generated-sources/protobuf/java/prometheus/Types.java
+/home/ivanas/Documents/repository/personal/github/remote-reader-prometheus-source-flink/src/main/java/com/github/ivanas93/reader/model/TimeSerie.java
+/home/ivanas/Documents/repository/personal/github/remote-reader-prometheus-source-flink/src/main/java/com/github/ivanas93/reader/model/Label.java
+/home/ivanas/Documents/repository/personal/github/remote-reader-prometheus-source-flink/src/main/java/com/github/ivanas93/reader/RemoteReadSource.java
+/home/ivanas/Documents/repository/personal/github/remote-reader-prometheus-source-flink/src/main/java/com/github/ivanas93/reader/configuration/RemoteReadHeader.java
+/home/ivanas/Documents/repository/personal/github/remote-reader-prometheus-source-flink/target/generated-sources/protobuf/java/prometheus/Remote.java
+/home/ivanas/Documents/repository/personal/github/remote-reader-prometheus-source-flink/src/main/java/com/github/ivanas93/reader/configuration/RemoteReadConfiguration.java
