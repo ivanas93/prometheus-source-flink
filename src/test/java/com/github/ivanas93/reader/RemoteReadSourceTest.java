@@ -5,6 +5,7 @@ import com.github.ivanas93.reader.model.TimeSerie;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import okhttp3.ConnectionPool;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -13,17 +14,23 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.xerial.snappy.Snappy;
+import prometheus.Remote;
+import prometheus.Types;
 
 import java.net.ConnectException;
-import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.github.ivanas93.reader.configuration.RemoteReadHeader.CONTENT_ENCODING;
+import static com.github.ivanas93.reader.configuration.RemoteReadHeader.CONTENT_ENCODING_VALUE;
+import static com.github.ivanas93.reader.configuration.RemoteReadHeader.PROMETHEUS_REMOTE_WRITE_VALUE;
+import static com.github.ivanas93.reader.configuration.RemoteReadHeader.PROMETHEUS_REMOTE_WRITE_VERSION;
 import static org.awaitility.Awaitility.given;
 
 class RemoteReadSourceTest {
@@ -46,7 +53,6 @@ class RemoteReadSourceTest {
 
     @Test
     @SneakyThrows
-    @Disabled
     void shouldAcceptRequest() {
         //Given-When
         Executors.newSingleThreadExecutor()
@@ -71,7 +77,10 @@ class RemoteReadSourceTest {
                 .until(() -> {
                     while (!RemoteReadSourceTest.result.get()) {
                         httpClient.newCall(new Request.Builder()
-                                        .post(RequestBody.create("".getBytes(StandardCharsets.UTF_8)))
+                                        .post(RequestBody.create(getTimeSeriesByteArray(),
+                                                MediaType.get("application/x-protobuf")))
+                                        .addHeader(CONTENT_ENCODING, CONTENT_ENCODING_VALUE)
+                                        .addHeader(PROMETHEUS_REMOTE_WRITE_VERSION, PROMETHEUS_REMOTE_WRITE_VALUE)
                                         .url("http://localhost:8080/api/v1/write/")
                                         .build())
                                 .execute();
@@ -79,6 +88,40 @@ class RemoteReadSourceTest {
                     return result.get();
                 });
     }
+
+    @SneakyThrows
+    public byte[] getTimeSeriesByteArray() {
+        Remote.WriteRequest.Builder writeRequestBuilder = Remote.WriteRequest.newBuilder();
+
+        Types.TimeSeries.Builder timeSeriesBuilder = Types.TimeSeries.newBuilder();
+        Types.Label.Builder labelBuilder = Types.Label.newBuilder();
+        Types.Sample.Builder sampleBuilder = Types.Sample.newBuilder();
+
+
+        labelBuilder.setName("name1")
+                .setValue("value1");
+
+        labelBuilder.setName("name2")
+                .setValue("value2");
+
+        Types.Label l = labelBuilder.build();
+
+        sampleBuilder.setValue(1)
+                .setTimestamp(1111111111L);
+
+        Types.Sample s = sampleBuilder.build();
+
+        timeSeriesBuilder.addAllLabels(List.of(l));
+        timeSeriesBuilder.addAllSamples(List.of(s));
+
+        Types.TimeSeries t = timeSeriesBuilder.build();
+        writeRequestBuilder.addAllTimeseries(List.of(t));
+
+        Remote.WriteRequest message = writeRequestBuilder.build();
+
+        return Snappy.compress(message.toByteArray());
+    }
+
 
     @AllArgsConstructor
     static class FakeSink implements SinkFunction<TimeSerie> {
