@@ -28,7 +28,6 @@
         <awaitility.version>4.1.1</awaitility.version>
         <awaitility-proxy.version>3.1.6</awaitility-proxy.version>
         <lombok.version>1.18.22</lombok.version>
-        <vavr.version>0.10.4</vavr.version>
         <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
         <maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
         <checkstyle.version>8.41.1</checkstyle.version>
@@ -98,11 +97,6 @@
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
             <version>${okhttp.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.vavr</groupId>
-            <artifactId>vavr</artifactId>
-            <version>${vavr.version}</version>
         </dependency>
 
         <dependency>

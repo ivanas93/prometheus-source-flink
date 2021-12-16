@@ -2,7 +2,6 @@ package com.github.ivanas93.reader;
 
 import com.github.ivanas93.reader.configuration.RemoteReadConfiguration;
 import com.github.ivanas93.reader.model.TimeSerie;
-import io.vavr.control.Try;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.configuration.Configuration;
@@ -48,15 +47,15 @@ public class RemoteReadSource extends RichSourceFunction<TimeSerie> {
         }
     }
 
+    @SneakyThrows
     @Override
     public void cancel() {
-        Try.run(() -> server.stop())
-                .onFailure(throwable -> log.error(throwable.toString()));
+        server.stop();
     }
 
+    @SneakyThrows
     private void startUp() {
-        Try.run(() -> server.join())
-                .andThenTry(() -> server.start())
-                .onFailure(throwable -> log.error(throwable.toString()));
+        server.join();
+        server.start();
     }
 }

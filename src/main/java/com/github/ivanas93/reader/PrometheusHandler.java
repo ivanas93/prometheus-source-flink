@@ -3,7 +3,6 @@ package com.github.ivanas93.reader;
 import com.github.ivanas93.reader.model.Label;
 import com.github.ivanas93.reader.model.Sample;
 import com.github.ivanas93.reader.model.TimeSerie;
-import io.vavr.control.Try;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
@@ -47,12 +46,15 @@ public class PrometheusHandler extends AbstractHandler {
             httpServletResponse.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
 
         } else {
+            try {
+                SnappyInputStream inputStream = new SnappyInputStream(request.getInputStream());
+                deserializeSnappyRequest(inputStream, httpServletResponse);
+            } catch (Exception exception) {
+                log.error(exception.toString());
+                httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            }
 
-            Try.of(() -> new SnappyInputStream(request.getInputStream()))
-                    .onFailure(throwable -> httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST))
-                    .onSuccess(inputStream -> deserializeSnappyRequest(inputStream, httpServletResponse));
         }
-
         outputStream.flush();
     }
 
@@ -69,34 +71,33 @@ public class PrometheusHandler extends AbstractHandler {
     }
 
     private void deserializeSnappyRequest(final SnappyInputStream inputStream,
-                                          final HttpServletResponse httpServletResponse) {
+                                          final HttpServletResponse httpServletResponse) throws IOException {
+        WriteRequest writeRequest = WriteRequest.parseFrom(inputStream);
 
-        Try.of(() -> WriteRequest.parseFrom(inputStream))
-                .onSuccess(writeRequest -> writeRequest.getTimeseriesList()
-                        .forEach(timeSeries -> {
-                            var labels = new ArrayList<Label>();
-                            var samples = new ArrayList<Sample>();
+        writeRequest.getTimeseriesList()
+                .forEach(timeSeries -> {
+                    var labels = new ArrayList<Label>();
+                    var samples = new ArrayList<Sample>();
 
-                            timeSeries.getLabelsList()
-                                    .forEach(label -> labels.add(Label.builder()
-                                            .value(label.getValue())
-                                            .name(label.getName())
-                                            .build()));
+                    timeSeries.getLabelsList()
+                            .forEach(label -> labels.add(Label.builder()
+                                    .value(label.getValue())
+                                    .name(label.getName())
+                                    .build()));
 
-                            timeSeries.getSamplesList()
-                                    .forEach(sample -> samples.add(Sample.builder()
-                                            .timestamp(sample.getTimestamp())
-                                            .sample(sample.getValue())
-                                            .build()));
+                    timeSeries.getSamplesList()
+                            .forEach(sample -> samples.add(Sample.builder()
+                                    .timestamp(sample.getTimestamp())
+                                    .sample(sample.getValue())
+                                    .build()));
 
-                            TIME_SERIES.add(TimeSerie.builder()
-                                    .samples(samples)
-                                    .labels(labels)
-                                    .build());
+                    TIME_SERIES.add(TimeSerie.builder()
+                            .samples(samples)
+                            .labels(labels)
+                            .build());
 
-                            httpServletResponse.setStatus(HttpServletResponse.SC_OK);
-                        }));
-
+                    httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+                });
     }
 
 }
