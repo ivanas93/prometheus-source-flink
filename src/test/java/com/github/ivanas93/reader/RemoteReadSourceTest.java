@@ -2,6 +2,7 @@ package com.github.ivanas93.reader;
 
 import com.github.ivanas93.reader.configuration.RemoteReadConfiguration;
 import com.github.ivanas93.reader.model.TimeSerie;
+import com.github.ivanas93.reader.test.SnappyContentUtil;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import okhttp3.ConnectionPool;
@@ -15,12 +16,8 @@ import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xerial.snappy.Snappy;
-import prometheus.Remote;
-import prometheus.Types;
 
 import java.net.ConnectException;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Executors;
@@ -31,6 +28,7 @@ import static com.github.ivanas93.reader.configuration.RemoteReadHeader.CONTENT_
 import static com.github.ivanas93.reader.configuration.RemoteReadHeader.CONTENT_ENCODING_VALUE;
 import static com.github.ivanas93.reader.configuration.RemoteReadHeader.PROMETHEUS_REMOTE_WRITE_VALUE;
 import static com.github.ivanas93.reader.configuration.RemoteReadHeader.PROMETHEUS_REMOTE_WRITE_VERSION;
+import static java.time.Instant.now;
 import static org.awaitility.Awaitility.given;
 
 class RemoteReadSourceTest {
@@ -66,7 +64,7 @@ class RemoteReadSourceTest {
 
                     try {
                         environment.execute("run_cluster_test");
-                    } catch (final Exception e) {
+                    } catch (Exception e) {
                         Assertions.fail();
                     }
 
@@ -76,9 +74,11 @@ class RemoteReadSourceTest {
                 .await()
                 .until(() -> {
                     while (!RemoteReadSourceTest.result.get()) {
+                        byte[] content = SnappyContentUtil.snappyTimeSeriesBuilder()
+                                .add("my_metric_name", Map.of("name", "my_name"), 1.0f, now().getEpochSecond())
+                                .toSnappy();
                         httpClient.newCall(new Request.Builder()
-                                        .post(RequestBody.create(getTimeSeriesByteArray(),
-                                                MediaType.get("application/x-protobuf")))
+                                        .post(RequestBody.create(content, MediaType.get("application/x-protobuf")))
                                         .addHeader(CONTENT_ENCODING, CONTENT_ENCODING_VALUE)
                                         .addHeader(PROMETHEUS_REMOTE_WRITE_VERSION, PROMETHEUS_REMOTE_WRITE_VALUE)
                                         .url("http://localhost:8080/api/v1/write/")
@@ -87,39 +87,6 @@ class RemoteReadSourceTest {
                     }
                     return result.get();
                 });
-    }
-
-    @SneakyThrows
-    public byte[] getTimeSeriesByteArray() {
-        Remote.WriteRequest.Builder writeRequestBuilder = Remote.WriteRequest.newBuilder();
-
-        Types.TimeSeries.Builder timeSeriesBuilder = Types.TimeSeries.newBuilder();
-        Types.Label.Builder labelBuilder = Types.Label.newBuilder();
-        Types.Sample.Builder sampleBuilder = Types.Sample.newBuilder();
-
-
-        labelBuilder.setName("name1")
-                .setValue("value1");
-
-        labelBuilder.setName("name2")
-                .setValue("value2");
-
-        Types.Label l = labelBuilder.build();
-
-        sampleBuilder.setValue(1)
-                .setTimestamp(1111111111L);
-
-        Types.Sample s = sampleBuilder.build();
-
-        timeSeriesBuilder.addAllLabels(List.of(l));
-        timeSeriesBuilder.addAllSamples(List.of(s));
-
-        Types.TimeSeries t = timeSeriesBuilder.build();
-        writeRequestBuilder.addAllTimeseries(List.of(t));
-
-        Remote.WriteRequest message = writeRequestBuilder.build();
-
-        return Snappy.compress(message.toByteArray());
     }
 
 

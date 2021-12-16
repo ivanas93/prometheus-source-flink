@@ -2,37 +2,33 @@ package com.github.ivanas93.reader;
 
 import com.github.ivanas93.reader.configuration.RemoteReadConfiguration;
 import com.github.ivanas93.reader.model.TimeSerie;
+import com.sun.net.httpserver.HttpServer;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.ContextHandler;
 
-import java.util.Optional;
+import java.net.InetSocketAddress;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 public class RemoteReadSource extends RichSourceFunction<TimeSerie> {
 
-    private transient Server server;
-    private transient PrometheusHandler prometheusHandler;
+
+    private final AtomicBoolean isRunning = new AtomicBoolean(true);
+    private transient HttpServer server;
     private final RemoteReadConfiguration remoteReadConfiguration;
+
 
     @Override
     public void open(final Configuration parameters) throws Exception {
         super.open(parameters);
 
-        this.prometheusHandler = new PrometheusHandler();
-        this.server = new Server(remoteReadConfiguration.getPort());
-
-        var context = new ContextHandler();
-        context.setContextPath(remoteReadConfiguration.getPath());
-        context.setAllowNullPathInfo(true);
-        context.setHandler(prometheusHandler);
-
-        this.server.setHandler(context);
-
-        this.startUp();
+        server = HttpServer.create(new InetSocketAddress(remoteReadConfiguration.getPort()), 0);
+        server.setExecutor(Executors.newSingleThreadExecutor());
+        server.start();
     }
 
     @SneakyThrows
@@ -41,21 +37,21 @@ public class RemoteReadSource extends RichSourceFunction<TimeSerie> {
     }
 
     @Override
+    @SneakyThrows
     public void run(final SourceContext<TimeSerie> ctx) {
-        while (server.isRunning() && prometheusHandler.isRunning()) {
-            Optional.ofNullable(PrometheusHandler.TIME_SERIES.poll()).ifPresent(ctx::collect);
+        server.createContext(remoteReadConfiguration.getPath(), new PrometheusHandler(ctx));
+        while (isRunning.get()) {
+            TimeUnit.SECONDS.sleep(5_000);
         }
     }
 
     @SneakyThrows
     @Override
     public void cancel() {
-        server.stop();
+        isRunning.set(false);
+        if (server != null) {
+            server.stop(3);
+        }
     }
 
-    @SneakyThrows
-    private void startUp() {
-        server.join();
-        server.start();
-    }
 }
