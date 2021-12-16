@@ -1,4 +1,4 @@
-package com.github.ivanas93.reader.configuration;
+package com.github.ivanas93.example.reader.configuration;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

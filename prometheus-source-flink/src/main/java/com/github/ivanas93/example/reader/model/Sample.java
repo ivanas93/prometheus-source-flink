@@ -1,4 +1,4 @@
-package com.github.ivanas93.reader.model;
+package com.github.ivanas93.example.reader.model;
 
 import lombok.Builder;
 import lombok.ToString;

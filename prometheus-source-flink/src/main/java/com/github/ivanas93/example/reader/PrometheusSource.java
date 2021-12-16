@@ -1,7 +1,7 @@
-package com.github.ivanas93.reader;
+package com.github.ivanas93.example.reader;
 
-import com.github.ivanas93.reader.configuration.PrometheusConfiguration;
-import com.github.ivanas93.reader.model.TimeSerie;
+import com.github.ivanas93.example.reader.configuration.PrometheusConfiguration;
+import com.github.ivanas93.example.reader.model.TimeSerie;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.configuration.Configuration;

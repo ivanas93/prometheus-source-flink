@@ -1,7 +1,7 @@
-package com.github.ivanas93.reader;
+package com.github.ivanas93.example.reader;
 
-import com.github.ivanas93.reader.configuration.PrometheusConfiguration;
-import com.github.ivanas93.reader.model.TimeSerie;
+import com.github.ivanas93.example.reader.configuration.PrometheusConfiguration;
+import com.github.ivanas93.example.reader.model.TimeSerie;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import okhttp3.ConnectionPool;
@@ -27,10 +27,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.github.ivanas93.reader.configuration.PrometheusHeader.CONTENT_ENCODING;
-import static com.github.ivanas93.reader.configuration.PrometheusHeader.CONTENT_ENCODING_VALUE;
-import static com.github.ivanas93.reader.configuration.PrometheusHeader.PROMETHEUS_REMOTE_WRITE_VALUE;
-import static com.github.ivanas93.reader.configuration.PrometheusHeader.PROMETHEUS_REMOTE_WRITE_VERSION;
+import static com.github.ivanas93.example.reader.configuration.PrometheusHeader.CONTENT_ENCODING;
+import static com.github.ivanas93.example.reader.configuration.PrometheusHeader.CONTENT_ENCODING_VALUE;
+import static com.github.ivanas93.example.reader.configuration.PrometheusHeader.PROMETHEUS_REMOTE_WRITE_VALUE;
+import static com.github.ivanas93.example.reader.configuration.PrometheusHeader.PROMETHEUS_REMOTE_WRITE_VERSION;
 import static org.awaitility.Awaitility.given;
 
 class PrometheusSourceTest {
