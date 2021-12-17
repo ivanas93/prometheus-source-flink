@@ -1,12 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
+
     <groupId>com.github.ivanas93</groupId>
     <artifactId>prometheus-source-flink</artifactId>
     <version>1.0.0</version>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Ivan Alvarez Sabin</name>
+            <email>ancarluji@gmail.com</email>
+            <organization>ivanas93</organization>
+            <organizationUrl>https://github.com/ivanas93</organizationUrl>
+            <timezone>UTC</timezone>
+        </developer>
+        <developer>
+            <name>Francisco Cejudo</name>
+            <email>fmcejudo@gmail.com</email>
+            <organization>fmcejudo</organization>
+            <organizationUrl>https://github.com/fmcejudo</organizationUrl>
+            <timezone>UTC</timezone>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/ivanas93/prometheus-source-flink</url>
+        <developerConnection>scm:git:git@github.com:ivanas93/prometheus-source-flink.git</developerConnection>
+        <connection>scm:git:git@github.com:ivanas93/prometheus-source-flink.git</connection>
+        <tag>HEAD</tag>
+    </scm>
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/ivanas93/prometheus-source-flink/issues</url>
+    </issueManagement>
+    <ciManagement>
+        <system>Action</system>
+        <url>https://github.com/ivanas93/prometheus-source-flink/actions/</url>
+    </ciManagement>
 
     <properties>
         <java.version>11</java.version>
@@ -149,7 +186,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -216,7 +252,6 @@
                 <version>3.0.0-M5</version>
             </plugin>
         </plugins>
-
         <extensions>
             <extension>
                 <groupId>kr.motd.maven</groupId>
@@ -239,5 +274,4 @@
             </plugin>
         </plugins>
     </reporting>
-
 </project>
