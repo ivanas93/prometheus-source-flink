@@ -1,6 +1,6 @@
 package com.github.ivanas93.reader;
 
-import com.github.ivanas93.reader.configuration.RemoteReadConfiguration;
+import com.github.ivanas93.reader.configuration.PrometheusConfiguration;
 import com.github.ivanas93.reader.model.TimeSeries;
 import com.sun.net.httpserver.HttpServer;
 import lombok.SneakyThrows;
@@ -15,37 +15,37 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
-public class RemoteReadSource extends RichSourceFunction<TimeSeries> {
+public class PrometheusSource extends RichSourceFunction<TimeSeries> {
 
 
     private final AtomicBoolean isRunning = new AtomicBoolean(true);
     private transient HttpServer server;
-    private final RemoteReadConfiguration remoteReadConfiguration;
+    private final PrometheusConfiguration prometheusConfiguration;
 
 
     @Override
     public void open(final Configuration parameters) throws Exception {
         super.open(parameters);
 
-        server = HttpServer.create(new InetSocketAddress(remoteReadConfiguration.getPort()), 0);
+        server = HttpServer.create(new InetSocketAddress(prometheusConfiguration.getPort()), 0);
         server.setExecutor(Executors.newSingleThreadExecutor());
         server.start();
     }
 
     @SneakyThrows
-    public RemoteReadSource(final String prefix, final Map<String, String> params) {
-        this(new RemoteReadConfiguration(prefix, params));
+    public PrometheusSource(final String prefix, final Map<String, String> params) {
+        this(new PrometheusConfiguration(prefix, params));
     }
 
     @SneakyThrows
-    public RemoteReadSource(final RemoteReadConfiguration remoteReadConfiguration) {
-        this.remoteReadConfiguration = remoteReadConfiguration;
+    public PrometheusSource(final PrometheusConfiguration prometheusConfiguration) {
+        this.prometheusConfiguration = prometheusConfiguration;
     }
 
     @Override
     @SneakyThrows
     public void run(final SourceContext<TimeSeries> ctx) {
-        server.createContext(remoteReadConfiguration.getPath(), new PrometheusHandler(ctx));
+        server.createContext(prometheusConfiguration.getPath(), new PrometheusHandler(ctx));
         while (isRunning.get()) {
             TimeUnit.SECONDS.sleep(5_000);
         }

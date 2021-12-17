@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class RemoteReadHeader {
+public class PrometheusHeader {
     public static final String CONTENT_ENCODING = "Content-Encoding";
     public static final String CONTENT_ENCODING_VALUE = "snappy";
 

@@ -18,11 +18,11 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.github.ivanas93.reader.configuration.RemoteReadHeader.CONTENT_ENCODING;
-import static com.github.ivanas93.reader.configuration.RemoteReadHeader.CONTENT_ENCODING_VALUE;
-import static com.github.ivanas93.reader.configuration.RemoteReadHeader.PROMETHEUS_MEDIA_TYPE;
-import static com.github.ivanas93.reader.configuration.RemoteReadHeader.PROMETHEUS_REMOTE_WRITE_VALUE;
-import static com.github.ivanas93.reader.configuration.RemoteReadHeader.PROMETHEUS_REMOTE_WRITE_VERSION;
+import static com.github.ivanas93.reader.configuration.PrometheusHeader.CONTENT_ENCODING;
+import static com.github.ivanas93.reader.configuration.PrometheusHeader.CONTENT_ENCODING_VALUE;
+import static com.github.ivanas93.reader.configuration.PrometheusHeader.PROMETHEUS_MEDIA_TYPE;
+import static com.github.ivanas93.reader.configuration.PrometheusHeader.PROMETHEUS_REMOTE_WRITE_VALUE;
+import static com.github.ivanas93.reader.configuration.PrometheusHeader.PROMETHEUS_REMOTE_WRITE_VERSION;
 import static org.apache.flink.shaded.akka.org.jboss.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;

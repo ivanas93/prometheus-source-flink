@@ -11,10 +11,10 @@ import okhttp3.RequestBody;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.ivanas93.reader.configuration.RemoteReadHeader.CONTENT_ENCODING;
-import static com.github.ivanas93.reader.configuration.RemoteReadHeader.CONTENT_ENCODING_VALUE;
-import static com.github.ivanas93.reader.configuration.RemoteReadHeader.PROMETHEUS_REMOTE_WRITE_VALUE;
-import static com.github.ivanas93.reader.configuration.RemoteReadHeader.PROMETHEUS_REMOTE_WRITE_VERSION;
+import static com.github.ivanas93.reader.configuration.PrometheusHeader.CONTENT_ENCODING;
+import static com.github.ivanas93.reader.configuration.PrometheusHeader.CONTENT_ENCODING_VALUE;
+import static com.github.ivanas93.reader.configuration.PrometheusHeader.PROMETHEUS_REMOTE_WRITE_VALUE;
+import static com.github.ivanas93.reader.configuration.PrometheusHeader.PROMETHEUS_REMOTE_WRITE_VERSION;
 import static java.time.Instant.now;
 
 public class SnappyMetricWriter {
