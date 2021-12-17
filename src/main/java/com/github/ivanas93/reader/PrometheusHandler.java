@@ -2,7 +2,7 @@ package com.github.ivanas93.reader;
 
 import com.github.ivanas93.reader.model.Label;
 import com.github.ivanas93.reader.model.Sample;
-import com.github.ivanas93.reader.model.TimeSerie;
+import com.github.ivanas93.reader.model.TimeSeries;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static com.github.ivanas93.reader.configuration.RemoteReadHeader.CONTENT_ENCODING;
 import static com.github.ivanas93.reader.configuration.RemoteReadHeader.CONTENT_ENCODING_VALUE;
@@ -30,9 +32,9 @@ import static org.apache.flink.shaded.akka.org.jboss.netty.handler.codec.http.Ht
 @Getter
 public class PrometheusHandler implements HttpHandler {
 
-    private final SourceContext<TimeSerie> context;
+    private final SourceContext<TimeSeries> context;
 
-    public PrometheusHandler(final SourceContext<TimeSerie> context) {
+    public PrometheusHandler(final SourceContext<TimeSeries> context) {
         this.context = context;
     }
 
@@ -40,22 +42,20 @@ public class PrometheusHandler implements HttpHandler {
     public void handle(final HttpExchange exchange) throws IOException {
         if (!validateHeaders(exchange) || !validateHttpMethod(exchange)) {
             exchange.sendResponseHeaders(HttpServletResponse.SC_PRECONDITION_FAILED, 0);
-            return;
-        }
-
-        if (!validateMediaType(exchange)) {
+        } else if (!validateMediaType(exchange)) {
             exchange.sendResponseHeaders(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, 0);
-            return;
+        } else {
+            InputStream body = exchange.getRequestBody();
+            try {
+                SnappyInputStream snappyInputStream = new SnappyInputStream(body);
+                deserializeSnappyRequest(snappyInputStream, context::collect);
+                exchange.sendResponseHeaders(HttpServletResponse.SC_OK, 0);
+            } catch (Exception exception) {
+                exchange.sendResponseHeaders(HttpServletResponse.SC_BAD_REQUEST, 0);
+            }
         }
-
-        InputStream body = exchange.getRequestBody();
-        try {
-            SnappyInputStream snappyInputStream = new SnappyInputStream(body);
-            deserializeSnappyRequest(snappyInputStream, context::collect);
-            exchange.sendResponseHeaders(HttpServletResponse.SC_OK, 0);
-        } catch (Exception exception) {
-            exchange.sendResponseHeaders(HttpServletResponse.SC_BAD_REQUEST, 0);
-        }
+        exchange.getResponseBody().flush();
+        exchange.getResponseBody().close();
     }
 
     private boolean validateHeaders(final HttpExchange exchange) {
@@ -83,7 +83,7 @@ public class PrometheusHandler implements HttpHandler {
     }
 
     private void deserializeSnappyRequest(final SnappyInputStream inputStream,
-                                          final Consumer<TimeSerie> timeSeriesConsumer) {
+                                          final Consumer<TimeSeries> timeSeriesConsumer) {
 
         try {
             WriteRequest writeRequest = WriteRequest.parseFrom(inputStream);
@@ -91,18 +91,30 @@ public class PrometheusHandler implements HttpHandler {
             writeRequest.getTimeseriesList().forEach(timeSeries -> {
                 var labels = new ArrayList<Label>();
                 var samples = new ArrayList<Sample>();
+
                 timeSeries.getLabelsList()
                         .forEach(label -> labels.add(Label.builder()
                                 .value(label.getValue())
                                 .name(label.getName())
                                 .build()));
 
+                Map<String, String> labelsMap = labels.stream()
+                        .filter(l -> !l.getName().equals("__name__"))
+                        .collect(Collectors.toMap(Label::getName, Label::getValue));
+
+                String metricName = labels.stream()
+                        .filter(l -> l.getName().equals("__name__"))
+                        .findFirst().map(Label::getName).orElseThrow();
+
                 timeSeries.getSamplesList()
                         .forEach(sample -> samples.add(Sample.builder()
+                                .labels(labelsMap)
+                                .metricName(metricName)
                                 .timestamp(sample.getTimestamp())
                                 .sample(sample.getValue())
                                 .build()));
-                timeSeriesConsumer.accept(TimeSerie.builder().samples(samples).labels(labels).build());
+
+                timeSeriesConsumer.accept(TimeSeries.builder().samples(samples).labels(labels).build());
             });
         } catch (IOException e) {
             throw new RuntimeException(e);

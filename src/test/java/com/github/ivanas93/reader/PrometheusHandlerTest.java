@@ -1,6 +1,6 @@
 package com.github.ivanas93.reader;
 
-import com.github.ivanas93.reader.model.TimeSerie;
+import com.github.ivanas93.reader.model.TimeSeries;
 import com.github.ivanas93.reader.test.SnappyContentUtil;
 import com.github.ivanas93.reader.test.TestSourceContext;
 import com.sun.net.httpserver.Headers;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,7 +37,7 @@ class PrometheusHandlerTest {
 
     PrometheusHandler prometheusHandler;
 
-    TestSourceContext<TimeSerie> context;
+    TestSourceContext<TimeSeries> context;
 
     @BeforeEach
     @SneakyThrows
@@ -49,6 +50,8 @@ class PrometheusHandlerTest {
             code.set(codeReceived);
             return null;
         }).when(exchange).sendResponseHeaders(anyInt(), anyLong());
+
+        Mockito.when(exchange.getResponseBody()).thenReturn(new ByteArrayOutputStream());
 
         headers = new Headers();
         Mockito.when(exchange.getRequestHeaders()).thenReturn(headers);

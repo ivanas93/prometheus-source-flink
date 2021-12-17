@@ -5,8 +5,10 @@ import org.xerial.snappy.Snappy;
 import prometheus.Remote;
 import prometheus.Types;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class SnappyContentUtil {
 
@@ -26,17 +28,23 @@ public class SnappyContentUtil {
         public SnappyTimeSeries add(final String metricName, final Map<String, String> labels,
                                     final float value, final long timestampInSecond) {
 
-            Types.Label.Builder labelBuilder = Types.Label.newBuilder();
+
             Types.Sample.Builder sampleBuilder = Types.Sample.newBuilder();
 
-            labels.forEach((k, v) -> labelBuilder.setName(k).setValue(v));
-            Types.Label l = labelBuilder.build();
+            List<Types.Label> timeSeriesLabels = new ArrayList<>();
+            timeSeriesLabels.add(Types.Label.newBuilder().setName("__name__").setValue(metricName).build());
+
+            List<Types.Label> metricLabels = labels.entrySet()
+                    .stream()
+                    .map(e -> Types.Label.newBuilder().setName(e.getKey()).setValue(e.getValue()).build())
+                    .collect(Collectors.toList());
+            timeSeriesLabels.addAll(metricLabels);
 
             sampleBuilder.setValue(value).setTimestamp(timestampInSecond);
             Types.Sample s = sampleBuilder.build();
 
             Types.TimeSeries.Builder timeSeriesBuilder = Types.TimeSeries.newBuilder();
-            timeSeriesBuilder.addAllLabels(List.of(l));
+            timeSeriesBuilder.addAllLabels(timeSeriesLabels);
             timeSeriesBuilder.addAllSamples(List.of(s));
             Types.TimeSeries timeSeries = timeSeriesBuilder.build();
             writeRequestBuilder.addAllTimeseries(List.of(timeSeries));

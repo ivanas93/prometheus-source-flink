@@ -1,7 +1,7 @@
 package com.github.ivanas93.reader;
 
 import com.github.ivanas93.reader.configuration.RemoteReadConfiguration;
-import com.github.ivanas93.reader.model.TimeSerie;
+import com.github.ivanas93.reader.model.TimeSeries;
 import com.github.ivanas93.reader.test.SnappyContentUtil;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -91,9 +91,9 @@ class RemoteReadSourceTest {
 
 
     @AllArgsConstructor
-    static class FakeSink implements SinkFunction<TimeSerie> {
+    static class FakeSink implements SinkFunction<TimeSeries> {
         @Override
-        public void invoke(final TimeSerie value, final Context context) throws Exception {
+        public void invoke(final TimeSeries value, final Context context) throws Exception {
             SinkFunction.super.invoke(value, context);
             Optional.ofNullable(value).ifPresent(timeSerie -> RemoteReadSourceTest.result.set(true));
         }
