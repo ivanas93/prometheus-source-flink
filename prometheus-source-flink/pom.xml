@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    
     <groupId>com.github.ivanas93</groupId>
     <artifactId>prometheus-source-flink</artifactId>
     <version>1.0.0</version>
@@ -14,9 +14,8 @@
         <protobuf-java-util.version>3.19.1</protobuf-java-util.version>
         <snappy-java.version>1.1.8.4</snappy-java.version>
         <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
-        <flink.version>1.14.0</flink.version>
+        <flink.version>1.12.2</flink.version>
         <scala.binary.version>2.11</scala.binary.version>
-        <flink-connector-kafka.version>1.14.0</flink-connector-kafka.version>
         <jetty.version>11.0.6</jetty.version>
         <junit-jupiter-api.version>5.8.2</junit-jupiter-api.version>
         <junit-jupiter-engine.version>5.8.2</junit-jupiter-engine.version>
@@ -33,6 +32,7 @@
         <checkstyle.version>8.41.1</checkstyle.version>
         <build-helper-maven-plugin.version>3.2.0</build-helper-maven-plugin.version>
         <os-maven-plugin.version>1.6.0</os-maven-plugin.version>
+        <assertj.version>3.21.0</assertj.version>
     </properties>
 
     <dependencies>
@@ -76,52 +76,33 @@
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-kafka_${scala.binary.version}</artifactId>
-            <version>${flink-connector-kafka.version}</version>
+            <version>${flink.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>${jetty.version}</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>5.0.0</version>
+            <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlet</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-client</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
+
+
+        <!-- test -->
+
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
             <version>${okhttp.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
+            <artifactId>junit-jupiter</artifactId>
             <version>${junit-jupiter-api.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit-jupiter-engine.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <version>${junit-vintage-engine.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <version>${junit-jupiter-params.version}</version>
-            <scope>test</scope>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -139,12 +120,6 @@
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
             <version>${awaitility.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.awaitility</groupId>
-            <artifactId>awaitility-proxy</artifactId>
-            <version>${awaitility-proxy.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -234,6 +209,11 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M5</version>
             </plugin>
         </plugins>
 

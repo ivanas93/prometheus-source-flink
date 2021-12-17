@@ -1,7 +1,8 @@
-package com.github.ivanas93.example.reader;
+package com.github.ivanas93.reader;
 
-import com.github.ivanas93.example.reader.configuration.PrometheusConfiguration;
-import com.github.ivanas93.example.reader.model.TimeSerie;
+import com.github.ivanas93.reader.configuration.PrometheusConfiguration;
+import com.github.ivanas93.reader.model.TimeSeries;
+import com.github.ivanas93.reader.test.SnappyContentUtil;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import okhttp3.ConnectionPool;
@@ -15,22 +16,19 @@ import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xerial.snappy.Snappy;
-import prometheus.Remote;
-import prometheus.Types;
 
 import java.net.ConnectException;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.github.ivanas93.example.reader.configuration.PrometheusHeader.CONTENT_ENCODING;
-import static com.github.ivanas93.example.reader.configuration.PrometheusHeader.CONTENT_ENCODING_VALUE;
-import static com.github.ivanas93.example.reader.configuration.PrometheusHeader.PROMETHEUS_REMOTE_WRITE_VALUE;
-import static com.github.ivanas93.example.reader.configuration.PrometheusHeader.PROMETHEUS_REMOTE_WRITE_VERSION;
+import static com.github.ivanas93.reader.configuration.PrometheusHeader.CONTENT_ENCODING;
+import static com.github.ivanas93.reader.configuration.PrometheusHeader.CONTENT_ENCODING_VALUE;
+import static com.github.ivanas93.reader.configuration.PrometheusHeader.PROMETHEUS_REMOTE_WRITE_VALUE;
+import static com.github.ivanas93.reader.configuration.PrometheusHeader.PROMETHEUS_REMOTE_WRITE_VERSION;
+import static java.time.Instant.now;
 import static org.awaitility.Awaitility.given;
 
 class PrometheusSourceTest {
@@ -66,7 +64,7 @@ class PrometheusSourceTest {
 
                     try {
                         environment.execute("run_cluster_test");
-                    } catch (final Exception e) {
+                    } catch (Exception e) {
                         Assertions.fail();
                     }
 
@@ -76,9 +74,11 @@ class PrometheusSourceTest {
                 .await()
                 .until(() -> {
                     while (!PrometheusSourceTest.result.get()) {
+                        byte[] content = SnappyContentUtil.snappyTimeSeriesBuilder()
+                                .add("my_metric_name", Map.of("name", "my_name"), 1.0f, now().getEpochSecond())
+                                .toSnappy();
                         httpClient.newCall(new Request.Builder()
-                                        .post(RequestBody.create(getTimeSeriesByteArray(),
-                                                MediaType.get("application/x-protobuf")))
+                                        .post(RequestBody.create(content, MediaType.get("application/x-protobuf")))
                                         .addHeader(CONTENT_ENCODING, CONTENT_ENCODING_VALUE)
                                         .addHeader(PROMETHEUS_REMOTE_WRITE_VERSION, PROMETHEUS_REMOTE_WRITE_VALUE)
                                         .url("http://localhost:8080/api/v1/write/")
@@ -89,44 +89,11 @@ class PrometheusSourceTest {
                 });
     }
 
-    @SneakyThrows
-    public byte[] getTimeSeriesByteArray() {
-        Remote.WriteRequest.Builder writeRequestBuilder = Remote.WriteRequest.newBuilder();
-
-        Types.TimeSeries.Builder timeSeriesBuilder = Types.TimeSeries.newBuilder();
-        Types.Label.Builder labelBuilder = Types.Label.newBuilder();
-        Types.Sample.Builder sampleBuilder = Types.Sample.newBuilder();
-
-
-        labelBuilder.setName("name1")
-                .setValue("value1");
-
-        labelBuilder.setName("name2")
-                .setValue("value2");
-
-        Types.Label l = labelBuilder.build();
-
-        sampleBuilder.setValue(1)
-                .setTimestamp(1111111111L);
-
-        Types.Sample s = sampleBuilder.build();
-
-        timeSeriesBuilder.addAllLabels(List.of(l));
-        timeSeriesBuilder.addAllSamples(List.of(s));
-
-        Types.TimeSeries t = timeSeriesBuilder.build();
-        writeRequestBuilder.addAllTimeseries(List.of(t));
-
-        Remote.WriteRequest message = writeRequestBuilder.build();
-
-        return Snappy.compress(message.toByteArray());
-    }
-
 
     @AllArgsConstructor
-    static class FakeSink implements SinkFunction<TimeSerie> {
+    static class FakeSink implements SinkFunction<TimeSeries> {
         @Override
-        public void invoke(final TimeSerie value, final Context context) throws Exception {
+        public void invoke(final TimeSeries value, final Context context) throws Exception {
             SinkFunction.super.invoke(value, context);
             Optional.ofNullable(value).ifPresent(timeSerie -> PrometheusSourceTest.result.set(true));
         }
