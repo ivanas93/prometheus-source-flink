@@ -1,0 +1,23 @@
+jobmanager.rpc.port: 6123
+taskmanager.rpc.port: 6123
+blob.server.port: 6124
+query.server.port: 6125
+
+taskmanager.numberOfTaskSlots: 3
+
+parallelism.default: 3
+
+state.backend: filesystem
+state.checkpoints.dir: file:///opt/data/checkpoints/
+state.savepoints.dir: file:///opt/data/savepoints/
+state.backend.async: true
+
+web.log.path: /opt/flink/log/flink.log
+taskmanager.log.path: /opt/flink/log/flink.log
+
+jobmanager.heap.size: 1024m
+taskmanager.heap.size: 10000m
+
+execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
+
+jobmanager.rpc.address: jobmanager
