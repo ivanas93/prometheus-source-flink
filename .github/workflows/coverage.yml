@@ -36,6 +36,7 @@ jobs:
         id: jacoco
         uses: cicirello/jacoco-badge-generator@v2
         with:
+          jacoco-csv-file: prometheus-source-flink/target/site/jacoco/jacoco.csv
           badges-directory: badges
           generate-branches-badge: true
 
@@ -48,7 +49,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: jacoco-report
-          path: prometheus-source-flink/target/site/jacoco/
+          path: target/site/jacoco/
 
       - name: Commit and push
         if: ${{ github.event_name != 'pull_request' }}
