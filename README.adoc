@@ -1,5 +1,5 @@
 = FLINK PROMETHEUS SOURCE
-
+[![Java CI with Maven](https://github.com/ivanas93/prometheus-source-flink/actions/workflows/maven.yml/badge.svg)](https://github.com/ivanas93/prometheus-source-flink/actions/workflows/maven.yml) 
 == WHAT IS THIS FOR?
 
 The aim of this project is to create a source which can receive prometheus metrics with `prometheus standard`, transform into a model and move them to a Flink stream which is used on your ETL process.
