@@ -3,7 +3,7 @@ name: Coverage QA
 on:
   push:
     branches: [ main ]
-    paths: [ '**.java', '.github/workflows/build.yml' ]
+    paths: [ '**.java', '.github/workflows/coverage.yml' ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -30,7 +30,7 @@ jobs:
           java-version: '11'
 
       - name: Build with Maven
-        run: mvn -B package -Pcoverage
+        run: cd prometheus-source-flink && mvn -B package -Pcoverage
 
       - name: Generate JaCoCo badge
         id: jacoco
