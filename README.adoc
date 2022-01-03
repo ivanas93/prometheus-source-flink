@@ -22,7 +22,7 @@ In order to use this dependency into your flink app, you have to include it in y
 ----
 <dependency>
     <groupId>com.github.ivanas93</groupId>
-    <artifactId>remote-reader-prometheus-source-flink</artifactId>
+    <artifactId>prometheus-source-flink</artifactId>
     <version>1.0.0</version>
 </dependency>
 ----
