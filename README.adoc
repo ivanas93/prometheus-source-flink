@@ -1,7 +1,7 @@
 = FLINK PROMETHEUS SOURCE
 
 == STATUS
-image:https://github.com/ivanas93/prometheus-source-flink/actions/workflows/maven.yml/badge.svg[link="https://github.com/ivanas93/prometheus-source-flink/actions/workflows/maven.yml"]
+image:https://github.com/ivanas93/prometheus-source-flink/actions/workflows/maven.yml/badge.svg[link="https://github.com/ivanas93/prometheus-source-flink/actions/workflows/maven.yml"] image:../badges/jacoco.svg[link="https://github.com/ivanas93/prometheus-source-flink/actions/workflows/coverage.yml"]
 
 == WHAT IS THIS FOR?
 
