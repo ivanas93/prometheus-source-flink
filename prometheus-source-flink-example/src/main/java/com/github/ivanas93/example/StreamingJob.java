@@ -1,7 +1,7 @@
 package com.github.ivanas93.example;
 
-import com.github.ivanas93.example.reader.PrometheusSource;
-import com.github.ivanas93.example.reader.configuration.PrometheusConfiguration;
+import com.github.ivanas93.reader.PrometheusSource;
+import com.github.ivanas93.reader.configuration.PrometheusConfiguration;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 public class StreamingJob {
