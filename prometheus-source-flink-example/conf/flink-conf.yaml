@@ -21,3 +21,6 @@ taskmanager.heap.size: 10000m
 execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
 
 jobmanager.rpc.address: jobmanager
+
+app.source.remote-write-server.path: /api/v1/write/
+app.source.remote-write-server.port: 9091
