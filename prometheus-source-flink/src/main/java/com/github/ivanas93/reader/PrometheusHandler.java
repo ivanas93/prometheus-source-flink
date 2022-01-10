@@ -26,7 +26,7 @@ import static com.github.ivanas93.reader.configuration.PrometheusHeader.CONTENT_
 import static com.github.ivanas93.reader.configuration.PrometheusHeader.PROMETHEUS_MEDIA_TYPE;
 import static com.github.ivanas93.reader.configuration.PrometheusHeader.PROMETHEUS_REMOTE_WRITE_VALUE;
 import static com.github.ivanas93.reader.configuration.PrometheusHeader.PROMETHEUS_REMOTE_WRITE_VERSION;
-import static org.apache.flink.shaded.akka.org.jboss.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
+import static org.apache.flink.shaded.curator4.com.google.common.net.HttpHeaders.CONTENT_TYPE;
 
 @Slf4j
 @Getter
