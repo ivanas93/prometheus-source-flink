@@ -17,6 +17,13 @@
         <maven.compiler.source>${target.java.version}</maven.compiler.source>
         <maven.compiler.target>${target.java.version}</maven.compiler.target>
         <log4j.version>2.17.0</log4j.version>
+        <prometheus-source-flink.version>1.0.0</prometheus-source-flink.version>
+        <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.source>11</maven-compiler-plugin.source>
+        <maven-shade-plugin.version>3.1.1</maven-shade-plugin.version>
+        <lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
+        <lifecycle-mapping.versionRange>[3.1.1,)</lifecycle-mapping.versionRange>
+        <lifecycle-mapping-filter.versionRange>[3.1,)</lifecycle-mapping-filter.versionRange>
     </properties>
 
     <repositories>
@@ -44,36 +51,31 @@
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-streaming-java_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-clients_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
             <version>${log4j.version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
             <version>${log4j.version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <version>${log4j.version}</version>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.github.ivanas93</groupId>
             <artifactId>prometheus-source-flink</artifactId>
-            <version>1.0.0</version>
+            <version>${prometheus-source-flink.version}</version>
         </dependency>
     </dependencies>
 
@@ -82,16 +84,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>${maven-compiler-plugin.source}</source>
+                    <target>${maven-compiler-plugin.source}</target>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.1.1</version>
+                <version>${maven-shade-plugin.version}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -135,7 +137,7 @@
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
                     <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
+                    <version>${lifecycle-mapping.version}</version>
                     <configuration>
                         <lifecycleMappingMetadata>
                             <pluginExecutions>
@@ -143,7 +145,7 @@
                                     <pluginExecutionFilter>
                                         <groupId>org.apache.maven.plugins</groupId>
                                         <artifactId>maven-shade-plugin</artifactId>
-                                        <versionRange>[3.1.1,)</versionRange>
+                                        <versionRange>${lifecycle-mapping.versionRange}</versionRange>
                                         <goals>
                                             <goal>shade</goal>
                                         </goals>
@@ -156,7 +158,7 @@
                                     <pluginExecutionFilter>
                                         <groupId>org.apache.maven.plugins</groupId>
                                         <artifactId>maven-compiler-plugin</artifactId>
-                                        <versionRange>[3.1,)</versionRange>
+                                        <versionRange>${lifecycle-mapping-filter.versionRange}</versionRange>
                                         <goals>
                                             <goal>testCompile</goal>
                                             <goal>compile</goal>
