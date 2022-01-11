@@ -47,7 +47,7 @@ public class PrometheusSource extends RichSourceFunction<TimeSeries> {
     public void run(final SourceContext<TimeSeries> ctx) {
         server.createContext(prometheusConfiguration.getPath(), new PrometheusHandler(ctx));
         while (isRunning.get()) {
-            TimeUnit.SECONDS.sleep(5_000);
+            TimeUnit.SECONDS.sleep(prometheusConfiguration.getWaitingInitialization());
         }
     }
 
@@ -56,7 +56,7 @@ public class PrometheusSource extends RichSourceFunction<TimeSeries> {
     public void cancel() {
         isRunning.set(false);
         if (server != null) {
-            server.stop(3);
+            server.stop(prometheusConfiguration.getStopDelay());
         }
     }
 
