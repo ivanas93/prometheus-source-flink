@@ -18,26 +18,29 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class PrometheusSource extends RichSourceFunction<TimeSeries> {
 
 
-    private final AtomicBoolean isRunning = new AtomicBoolean(true);
+    private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private transient HttpServer server;
     private final PrometheusConfiguration prometheusConfiguration;
 
 
     @Override
-    public void open(final Configuration parameters) throws Exception {
-        super.open(parameters);
-
-        server = HttpServer.create(new InetSocketAddress(prometheusConfiguration.getPort()), 0);
-        server.setExecutor(Executors.newSingleThreadExecutor());
-        server.start();
+    public void open(final Configuration parameters) throws RuntimeException {
+        try {
+            super.open(parameters);
+            server = HttpServer.create(new InetSocketAddress(prometheusConfiguration.getPort()), 0);
+            server.setExecutor(Executors.newSingleThreadExecutor());
+            server.start();
+            isRunning.set(true);
+        } catch (final Exception exception) {
+            isRunning.set(false);
+            throw new RuntimeException("Error during open operator PrometheusSource: " + exception.getMessage());
+        }
     }
 
-    @SneakyThrows
     public PrometheusSource(final String prefix, final Map<String, String> params) {
         this(new PrometheusConfiguration(prefix, params));
     }
 
-    @SneakyThrows
     public PrometheusSource(final PrometheusConfiguration prometheusConfiguration) {
         this.prometheusConfiguration = prometheusConfiguration;
     }
